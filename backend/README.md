@@ -24,24 +24,24 @@ This backend is developed using **Flask**, a lightweight web framework in Python
 To install and run the EcoNecta backend, please follow these steps:
 
 1. Clone the repository:
-  ```bash
-  git clone https://github.com/your_username/econecta-backend.git
-  cd econecta-backend
-  ```
+    ```bash
+    git clone https://github.com/your_username/econecta-backend.git](https://github.com/ojedavd/EcoNecta.git
+    cd econecta-backend
+    ```
 2. Create a virtual environment:
-
-python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
-
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows use: venv\Scripts\activate
+    ```
 3. Install the dependencies:
-  ```bash
-  pip install -r requirements.txt
-  ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 4. Run the application:
-  ```bash
-  python app.py
-  ```
+    ```bash
+    python app.py
+    ```
 
 ## Usage
 
