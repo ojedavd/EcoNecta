@@ -1,0 +1,23 @@
+<div class="cultivo-card">
+  <div class="row w-100">
+    <div class="col-3 p-3">
+      <h3>{{ cultivo.nombre }}</h3>
+      <h1> {{ cultivo.porcentaje }}%</h1>
+    </div>
+    <div class="col-9 p-3">
+      <p>Requiere Riego:</p> <span>{{ cultivo.riego }}</span>
+      <p>Tiempo de Cosecha:</p> <span>{{ cultivo.tiempoCosecha }} días</span>
+    </div>
+  </div>
+  <div class="row w-100">
+    <div class="col">
+      <p>Temperatura</p> {{ cultivo.temperatura }}
+    </div>
+    <div class="col">
+      <p>Humedad</p> {{ cultivo.humedad }}
+    </div>
+    <div class="col">
+      <p>Lluvia</p> {{ cultivo.lluvia }}
+    </div>
+  </div>
+</div>

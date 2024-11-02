@@ -1,0 +1,45 @@
+:host {
+    font-family: 'Roboto';
+    font-size: larger;
+}
+
+.container {
+    height: 100%;
+    padding-top: 20px;
+}
+
+label {
+    font-weight: 600;
+    color: #4caf50;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group.text-center {
+    display: flex;
+    justify-content: center;
+}
+
+
+
+input[type="date"].form-control {
+    width: 100%;
+    max-width: 100%; /* Asegura que no se expanda */
+    box-sizing: border-box;
+}
+
+button.btn-block {
+    width: 100%;
+}
+

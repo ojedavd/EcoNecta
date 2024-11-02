@@ -1,0 +1,13 @@
+.cultivos-container {
+    max-width: 600px;
+    padding: 16px;
+    padding-top: 50px;
+    text-align: center;
+}
+
+h1 {
+    font-weight: 600;
+    color: #4caf50;
+    font-size: 1.2em;
+    margin-bottom: 24px;
+}
