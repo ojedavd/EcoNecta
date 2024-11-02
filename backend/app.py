@@ -1,15 +1,23 @@
 from flask import Flask, request, jsonify
 import pandas as pd
 import joblib
+import numpy as np
 from datetime import datetime
+from sklearn.preprocessing import LabelEncoder
 
 # Inicializa la aplicación Flask
 app = Flask(__name__)
 
 # Cargar los modelos previamente entrenados
-modelo_humidity = joblib.load('models/modelo_humidity.pkl')
-modelo_precip = joblib.load('models/modelo_precip.pkl')
-modelo_sequia = joblib.load('models/modelo_sequia.pkl')
+modelo_humidity = joblib.load('models/modelo_humidity_V2.pkl')
+modelo_precip = joblib.load('models/modelo_precip_V2.pkl')
+modelo_sequia = joblib.load('models/modelo_drought_V2.pkl')
+modelo_cultivo = joblib.load('models/modelo_cultivo.pkl')
+model_N = joblib.load('models/model_N.joblib')
+model_P = joblib.load('models/model_P.joblib')
+model_K = joblib.load('models/model_K.joblib')
+model_pH = joblib.load('models/model_pH.joblib')
+
 
 # Definir una ruta para realizar predicciones
 @app.route('/predclim', methods=['POST'])
@@ -21,9 +29,6 @@ def predclim():
         # Extraer y procesar la fecha
         fecha = datos.get('fecha')  # Ejemplo de formato esperado: "2024-11-01"
         fecha_dt = datetime.strptime(fecha, '%Y-%m-%d')
-        year = fecha_dt.year
-        month = fecha_dt.month
-        day = fecha_dt.day
 
         # Extraer otros datos
         temp_max = datos.get('temp_max')
@@ -31,21 +36,20 @@ def predclim():
         humidity = datos.get('humidity')
         precip = datos.get('precip', 0)  # Puede que 'precip' no siempre esté presente
 
+        # Calcular temperatura promedio para el modelo
+        temp = (temp_max + temp_min) / 2  # Promedio de temperatura máxima y mínima
+
         # Crear un DataFrame con los datos
         X = pd.DataFrame([{
-            'temp_max': temp_max,
-            'temp_min': temp_min,
+            'temp': temp,
             'humidity': humidity,
-            'precip': precip,
-            'year': year,
-            'month': month,
-            'day': day
+            'precip': precip
         }])
 
         # Realizar las predicciones
         pred_humedad = modelo_humidity.predict(X)[0]
         pred_precip = modelo_precip.predict(X)[0]
-        pred_sequia = modelo_sequia.predict(X)[0]
+        pred_sequia = modelo_sequia.predict(X)[0]  # Si decides predecir sequía
 
         # Retorna las predicciones en formato JSON
         return jsonify({
@@ -58,7 +62,49 @@ def predclim():
         return jsonify({'error': str(e)}), 400
 
 
-modelo_cultivo = joblib.load('models/modelo_cultivo.pkl')
+label_encoder = LabelEncoder()
+label_encoder.classes_ = np.array(['Fresno', 'Los Angeles', 'Sacramento','San Diego','San Francisco'], dtype=object)  # Usar un array de NumPy explícitamente
+
+# Ruta para hacer predicciones
+@app.route('/predsuelo', methods=['POST'])
+def predsuelo():
+    try:
+        # Obtener los datos enviados en el cuerpo de la solicitud
+        data = request.get_json()
+        ciudad = data['ciudad']
+        fecha = data['fecha']
+
+        # Validar que los datos de entrada no sean None
+        if not ciudad or not fecha:
+            return jsonify({"error": "Faltan datos: ciudad o fecha no proporcionados"}), 400
+
+        # Codificar la ciudad
+        ciudad_codificada = label_encoder.transform([ciudad])[0]  # Aquí no se necesita dtype
+
+        # Convertir la fecha a día, mes y año
+        fecha = pd.to_datetime(fecha)
+        dia, mes, año = fecha.day, fecha.month, fecha.year
+
+        # Preparar los datos de entrada para el modelo
+        X_nueva = [[dia, mes, año, ciudad_codificada]]
+
+        # Hacer las predicciones
+        pred_N = model_N.predict(X_nueva)[0]
+        pred_P = model_P.predict(X_nueva)[0]
+        pred_K = model_K.predict(X_nueva)[0]
+        pred_pH = model_pH.predict(X_nueva)[0]
+
+        # Devolver las predicciones como JSON
+        response = {
+            "Nitrogen (N)": pred_N,
+            "Phosphorus (P)": pred_P,
+            "Potassium (K)": pred_K,
+            "pH": pred_pH
+        }
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/predcult', methods=['POST'])
 def predcult():
